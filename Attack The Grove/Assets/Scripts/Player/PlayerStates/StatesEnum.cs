@@ -6,10 +6,11 @@ public enum StatesEnum
 {
     Default,
     Idle,
-    Walk,
     Patrol,
-    Attack,
-    Chase,
     Follow,
-    Dead
+    Chase,
+    Order,
+    Attack,
+    Flee,
+    Death
 }

@@ -13,6 +13,9 @@ public class EnemyModel : MonoBehaviour
     public int currentWaypointIndex = 0; // Index of the current waypoint
     public int index;
 
+    public float health;
+    public float Health => health;
+
 
     private void Awake()
     {
@@ -42,11 +45,19 @@ public class EnemyModel : MonoBehaviour
     {
         StartCoroutine(Cooldown());
     }
+
+    public void Death()
+    {
+        Destroy(gameObject);
+    }
+
    
     IEnumerator Cooldown()
     {
         // Add bullet logic
         yield return true;
     }
+
+
 
 }

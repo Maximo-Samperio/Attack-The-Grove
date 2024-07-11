@@ -58,23 +58,29 @@ public class EnemyController : MonoBehaviour
         var idle = new EnemyIdleState<StatesEnum>();
         var chase = new EnemyChaseState<StatesEnum>(_model, _pursuit, _obstacleAvoidance);
         var attack = new EnemyAttackState<StatesEnum>(_model);
+        var death = new EnemyDeathState<StatesEnum>(_model);
+
         _stateFollowPoints = new EnemyPatrolState<StatesEnum>(_model);
 
         idle.AddTransition(StatesEnum.Chase, chase);
         idle.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
         idle.AddTransition(StatesEnum.Attack, attack);
+        idle.AddTransition(StatesEnum.Death, death);
 
         chase.AddTransition(StatesEnum.Idle, idle);                     
         chase.AddTransition(StatesEnum.Patrol, _stateFollowPoints);     
         chase.AddTransition(StatesEnum.Attack, attack);
+        chase.AddTransition(StatesEnum.Death, death);
 
         attack.AddTransition(StatesEnum.Idle, idle);
         attack.AddTransition(StatesEnum.Chase, chase);
         attack.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
-
+        attack.AddTransition(StatesEnum.Death, death);
 
         _stateFollowPoints.AddTransition(StatesEnum.Idle, idle);
         _stateFollowPoints.AddTransition(StatesEnum.Chase, chase);
+        _stateFollowPoints.AddTransition(StatesEnum.Death, death);
+
 
         _fsm = new FSM<StatesEnum>(idle);
     }
@@ -96,10 +102,12 @@ public class EnemyController : MonoBehaviour
         var patrol = new ActionNode(() => _fsm.Transition(StatesEnum.Patrol));
         var chase = new ActionNode(() => _fsm.Transition(StatesEnum.Chase));
         var attack = new ActionNode(() => _fsm.Transition(StatesEnum.Attack));
+        var death = new ActionNode(() => _fsm.Transition(StatesEnum.Death));
 
         // Questions
         var qPatrol = new QuestionNode(QuestionPatrol, patrol, idle);
         var qLoS = new QuestionNode(QuestionLoS, chase, qPatrol);
+        var qHealth = new QuestionNode(() => _model.Health <= 0, qLoS, death);
 
         _root = qLoS;
     }
