@@ -17,7 +17,6 @@ public class DroneController : MonoBehaviour
     [SerializeField] float closeToLeader;
     [SerializeField] GameObject target;
 
-
     public LeaderBehaviour leaderBehaviour;
 
     ISteering _steering;
@@ -50,9 +49,11 @@ public class DroneController : MonoBehaviour
     {
         var idle = new DroneIdleState<StatesEnum>(_model);
         var follow = new DroneFollowState<StatesEnum>(_model, _steering, _obstacleAvoidance);
-        
+       // var flee = new DroneStateFlee<StatesEnum>(_steering); //lefe
+
         idle.AddTransition(StatesEnum.Follow, follow);
         follow.AddTransition(StatesEnum.Idle, idle);
+       // flee.AddTransition(StatesEnum.Follow, flee); //lefe
 
         _fsm = new FSM<StatesEnum>(idle);
     }
@@ -64,6 +65,7 @@ public class DroneController : MonoBehaviour
         _steering = GetComponent<FlockingManager>();
 
         _obstacleAvoidance = new ObstacleAvoidanceV2(_model.transform, angle, radius, maskObs, personalArea);
+
     }
 
     void InitializedTree()
@@ -71,9 +73,9 @@ public class DroneController : MonoBehaviour
         // Actions
         var idle = new ActionNode(() => _fsm.Transition(StatesEnum.Idle));
         var follow = new ActionNode(() => _fsm.Transition(StatesEnum.Follow));
+        var flee = new ActionNode(() => _fsm.Transition(StatesEnum.Flee)); //lefe
         var attack = new ActionNode(() => EndGame());
-
-
+        
         // Questions
         QuestionNode distanceToLead = new QuestionNode(QuestionTooClose, idle, follow);
 

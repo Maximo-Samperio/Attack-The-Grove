@@ -16,7 +16,7 @@ public class EnemyController : MonoBehaviour
     Coroutine coroutine;
     [SerializeField] float _totalChaseTime;
     public bool seen;
-
+    public float currentHealth;
     ISteering _pursuit;
     ObstacleAvoidanceV2 _obstacleAvoidance;
 
@@ -35,6 +35,7 @@ public class EnemyController : MonoBehaviour
 
     private void Awake()
     {
+        currentHealth = _model.Health;
         _model = GetComponent<EnemyModel>();
         _los = GetComponent<ILineOfSight>();
         _targetRigidbody = target.GetComponent<Rigidbody>();
@@ -45,7 +46,7 @@ public class EnemyController : MonoBehaviour
         InitializeSteerings();
         InitializedTree();
         InitializeFSM();
-
+        Debug.Log(currentHealth);
         if (_agentController != null)
         {
             IncreaseWaypontIndex();
@@ -59,6 +60,7 @@ public class EnemyController : MonoBehaviour
         var chase = new EnemyChaseState<StatesEnum>(_model, _pursuit, _obstacleAvoidance);
         var attack = new EnemyAttackState<StatesEnum>(_model);
         var death = new EnemyDeathState<StatesEnum>(_model);
+        var flee = new EnemyFleeState<StatesEnum>(_model, target.transform, _pursuit, _obstacleAvoidance); //lefe
 
         _stateFollowPoints = new EnemyPatrolState<StatesEnum>(_model);
 
@@ -66,21 +68,30 @@ public class EnemyController : MonoBehaviour
         idle.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
         idle.AddTransition(StatesEnum.Attack, attack);
         idle.AddTransition(StatesEnum.Death, death);
+        idle.AddTransition(StatesEnum.Flee, flee);
 
         chase.AddTransition(StatesEnum.Idle, idle);                     
         chase.AddTransition(StatesEnum.Patrol, _stateFollowPoints);     
         chase.AddTransition(StatesEnum.Attack, attack);
         chase.AddTransition(StatesEnum.Death, death);
+        chase.AddTransition(StatesEnum.Flee, flee);
 
         attack.AddTransition(StatesEnum.Idle, idle);
         attack.AddTransition(StatesEnum.Chase, chase);
         attack.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
         attack.AddTransition(StatesEnum.Death, death);
+        attack.AddTransition(StatesEnum.Flee, flee);
+
+        flee.AddTransition(StatesEnum.Idle, idle);
+        flee.AddTransition(StatesEnum.Chase, chase);
+        flee.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
+        flee.AddTransition(StatesEnum.Death, death);
+        flee.AddTransition(StatesEnum.Attack, attack);
 
         _stateFollowPoints.AddTransition(StatesEnum.Idle, idle);
         _stateFollowPoints.AddTransition(StatesEnum.Chase, chase);
         _stateFollowPoints.AddTransition(StatesEnum.Death, death);
-
+        _stateFollowPoints.AddTransition(StatesEnum.Flee, flee);
 
         _fsm = new FSM<StatesEnum>(idle);
     }
@@ -93,6 +104,7 @@ public class EnemyController : MonoBehaviour
         _pursuit = pursuit;
 
         _obstacleAvoidance = new ObstacleAvoidanceV2(_model.transform, angle, radius, maskObs, personalArea);
+
     }
 
     void InitializedTree()
@@ -103,13 +115,16 @@ public class EnemyController : MonoBehaviour
         var chase = new ActionNode(() => _fsm.Transition(StatesEnum.Chase));
         var attack = new ActionNode(() => _fsm.Transition(StatesEnum.Attack));
         var death = new ActionNode(() => _fsm.Transition(StatesEnum.Death));
+        var flee = new ActionNode(() => _fsm.Transition(StatesEnum.Flee)); // lefe
+
 
         // Questions
         var qPatrol = new QuestionNode(QuestionPatrol, patrol, idle);
         var qLoS = new QuestionNode(QuestionLoS, chase, qPatrol);
-        var qHealth = new QuestionNode(() => _model.Health <= 0, qLoS, death);
+        var qFlee = new QuestionNode(() => _model.Health >= 10, qLoS, flee);
+        var qHealth = new QuestionNode(() => _model.Health >= 0, qFlee, death);
 
-        _root = qLoS;
+        _root = qHealth;
     }
 
     bool QuestionLoS()
@@ -136,7 +151,12 @@ public class EnemyController : MonoBehaviour
         seen = currLoS;
         return seen;
     }
+    bool QuestionHealth()
+    {
+        Debug.Log(_model.Health <= 0);
+        return _model.Health <= 0;
 
+    }
 
     bool QuestionPatrol()
     {
@@ -165,6 +185,8 @@ public class EnemyController : MonoBehaviour
     {
         _fsm.OnUpdate();
         _root.Execute();
+        Debug.Log(currentHealth);
+
     }
 
     private void OnTriggerEnter(Collider other)

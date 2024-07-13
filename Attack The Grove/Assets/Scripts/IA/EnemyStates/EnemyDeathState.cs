@@ -11,7 +11,7 @@ public class EnemyDeathState<T>: State<T>
         _model = model;
     }
 
-    public void Enter()
+    public override void Enter()
     {
         base.Enter();
         _model.Death();

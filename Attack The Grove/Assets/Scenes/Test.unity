@@ -1085,6 +1085,14 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 2057550089}
+    - target: {fileID: 4377730764668552480, guid: 3d8d49dccf847594bb70cd4fd1b0e62a, type: 3}
+      propertyPath: currentHealth
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6080155887437247916, guid: 3d8d49dccf847594bb70cd4fd1b0e62a, type: 3}
+      propertyPath: health
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 6080155887437247916, guid: 3d8d49dccf847594bb70cd4fd1b0e62a, type: 3}
       propertyPath: currentWayPoint
       value: 

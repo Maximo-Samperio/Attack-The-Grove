@@ -12,7 +12,6 @@ public class EnemyModel : MonoBehaviour
     public Node currentWayPoint;
     public int currentWaypointIndex = 0; // Index of the current waypoint
     public int index;
-
     public float health;
     public float Health => health;
 
@@ -48,6 +47,7 @@ public class EnemyModel : MonoBehaviour
 
     public void Death()
     {
+        Debug.Log("death");
         Destroy(gameObject);
     }
 
