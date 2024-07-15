@@ -29,9 +29,9 @@ public class PatrolState : MonoBehaviour
             Invoke(nameof(ContinuePatrol), waitDuration);   // Wait for the specified duration before continuing patrol
         }
     }
-private void MoveToWaypoint(int index)
+
+    private void MoveToWaypoint(int index)
     {
-        
         agent.SetDestination(waypoints[index].position);    // Set the destination to the position of the current waypoint
     }
 
@@ -39,23 +39,24 @@ private void MoveToWaypoint(int index)
     {
         isWaiting = false; // End the waiting period
 
-        // Move to the next waypoint
-        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-        MoveToWaypoint(currentWaypointIndex);
-
         // Roulette to go to a random waypoint inside the array
-        if (currentWaypointIndex == 0)
-        {
-            CalculateProbabilities();
-            RouletteMoveToNextWaypoint();
-        }
+        CalculateProbabilitiesAndMoveToNextWaypoint();
     }
 
-    private void RouletteMoveToNextWaypoint()
+    private void CalculateProbabilitiesAndMoveToNextWaypoint()
     {
-        List <float> probabilities = CalculateProbabilities();
+        List<float> probabilities = CalculateProbabilities();
         int selectedIndex = RouletteWheelSelection(probabilities);
-        agent.SetDestination(waypoints[selectedIndex].position);
+
+        if (selectedIndex != -1)
+        {
+            currentWaypointIndex = selectedIndex;
+            MoveToWaypoint(currentWaypointIndex);
+        }
+        else
+        {
+            Debug.LogError("No waypoints available for selection");
+        }
     }
 
     private List<float> CalculateProbabilities()
@@ -68,6 +69,7 @@ private void MoveToWaypoint(int index)
             float distance = Vector3.Distance(transform.position, waypoint.position);
             distances.Add(distance);
         }
+
         List<float> probabilities = new List<float>();
         float totalDistance = distances.Sum();
 
@@ -76,14 +78,17 @@ private void MoveToWaypoint(int index)
             float probability = 1f - (distance / totalDistance);
             probabilities.Add(probability);
         }
+
         return probabilities;
     }
+
     private int RouletteWheelSelection(List<float> probabilities)
     {
-        float randomValue = Random.value;  // Generate a random number between 0 and i
+        float totalProbability = probabilities.Sum();
+        float randomValue = Random.value * totalProbability;  // Generate a random number between 0 and the sum of probabilities
 
-        //  Make selection based on probabilities
-        float cumulativeProbability = 0;
+        // Make selection based on probabilities
+        float cumulativeProbability = 0f;
         for (int i = 0; i < probabilities.Count; i++)
         {
             cumulativeProbability += probabilities[i];
@@ -93,10 +98,8 @@ private void MoveToWaypoint(int index)
             }
         }
 
-        // If no waypoint can be selected 
-        Debug.LogError("No waypoints availiable");
+        // If no waypoint can be selected (should not happen if probabilities are correctly calculated)
+        Debug.LogError("No waypoints available for selection");
         return -1;
     }
-
-    
 }
