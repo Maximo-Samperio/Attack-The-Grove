@@ -278,7 +278,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &6689666006211006926
 MonoBehaviour:
@@ -296,6 +296,8 @@ MonoBehaviour:
   isDrone: 0
   closeToLeader: 3
   target: {fileID: 0}
+  attackRange: 0
+  currentHealth: 0
   leaderBehaviour: {fileID: 3938952914764276403}
   timePrediction: 1
   angle: 215
@@ -318,6 +320,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3
   speedRot: 0
+  fight: 0
+  Jagger: {fileID: 0}
   health: 0
 --- !u!114 &3012995898481468313
 MonoBehaviour:

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,11 +21,31 @@ public class AgentController : MonoBehaviour
         _enemy.GetStateWaypoints.SetWayPoints(path);
         box.SetWayPoints(path);
     }
+    public List<Node> RunAStar2(Vector3 startPos, Vector3 targetPos)
+    {
+        var start = GetNearNode(startPos);
+        var end = GetNearNode(targetPos);
+        if (start == null || end == null) return new List<Node>();
+        return AStar.Run(start, GetConnections, (x)=>IsSatiesfies(x,end), GetCost, (x)=> Heuristic(x,end));
+    }
+    public List<Node> RunAStar2(Vector3 startPos, Func<Node, bool> isSatisfies, Func<Node, float> heuristic)
+    {
+        var start = GetNearNode(startPos);
+        if (start == null) return new List<Node>();
+        return AStar.Run(start, GetConnections, isSatisfies, GetCost, heuristic);
+    }
     float Heuristic(Node current)
     {
         float heuristic = 0;
         float multiplierDistance = 1;
         heuristic += Vector3.Distance(current.transform.position, target.transform.position) * multiplierDistance;
+        return heuristic;
+    }
+    float Heuristic(Node current, Node end)
+    {
+        float heuristic = 0;
+        float multiplierDistance = 1;
+        heuristic += Vector3.Distance(current.transform.position, end.transform.position) * multiplierDistance;
         return heuristic;
     }
     float GetCost(Node parent, Node child)
@@ -62,6 +83,10 @@ public class AgentController : MonoBehaviour
     bool IsSatiesfies(Node current)
     {
         return current == target;
+    }
+    bool IsSatiesfies(Node current, Node end)
+    {
+        return current == end;
     }
     private void OnDrawGizmos()
     {

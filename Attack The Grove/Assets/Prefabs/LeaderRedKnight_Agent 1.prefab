@@ -662,7 +662,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &7195158382101070284
 CapsuleCollider:
@@ -703,6 +703,7 @@ MonoBehaviour:
   target: {fileID: 1022148595836406, guid: 5b5b1958cdf88ce49989e326859b9572, type: 3}
   _agentController: {fileID: 6882742752616928650}
   _totalChaseTime: 100
+  _orderTime: 1
   seen: 0
   currentHealth: 0
   timePrediction: 0
@@ -732,6 +733,7 @@ MonoBehaviour:
   index: 0
   Jagger: {fileID: 671189572416894397}
   health: 0
+  drones: []
 --- !u!114 &5321050902188819405
 MonoBehaviour:
   m_ObjectHideFlags: 0

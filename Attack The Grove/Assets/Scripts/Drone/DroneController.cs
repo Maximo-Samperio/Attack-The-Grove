@@ -126,13 +126,7 @@ public class DroneController : MonoBehaviour
                 //&& _los.CheckAngle(target.transform)
                 && _los.CheckView(target.transform);
 
-        if (seen == true && isDrone)
-        {
-            EndGame();
-            return seen;
-        }
         return seen;
-
     }
 
     bool QuestionTooClose()
@@ -166,10 +160,5 @@ public class DroneController : MonoBehaviour
             currentHealth--;
         }
 
-    }
-        private void EndGame()
-    {
-        Debug.Log("PLAYER SPOTTED BY DRONE!");
-        SceneManager.LoadScene("GameOver");
     }
 }

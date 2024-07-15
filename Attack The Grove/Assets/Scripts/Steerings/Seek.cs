@@ -7,6 +7,7 @@ public class Seek : ISteering
     Transform _entity;
     Transform _target;
     Vector3 _entityPosition;
+    public Rigidbody rb;
 
     public Seek(Transform entity, Transform target)
     {
@@ -17,6 +18,7 @@ public class Seek : ISteering
     {
         _target = target;
     }
+    public Seek() { }
 
     public Vector3 GetDir()
     {
@@ -31,4 +33,5 @@ public class Seek : ISteering
             _entityPosition = value;
         }
     }
+    public Transform Target { set { _target = value; } }
 }

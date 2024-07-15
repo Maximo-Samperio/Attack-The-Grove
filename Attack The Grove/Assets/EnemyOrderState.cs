@@ -21,6 +21,7 @@ public class EnemyOrderState<T> : State<T>
             _drones[i].AttackOrder();
         }
     }
+
     public override void Execute()
     {
         Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");

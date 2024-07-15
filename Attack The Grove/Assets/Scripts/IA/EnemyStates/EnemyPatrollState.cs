@@ -16,6 +16,11 @@ public class EnemyPatrolState<T> : State<T>, IPoints
     {
         _model = model;
     }
+    public override void Enter()
+    {
+        base.Enter();
+        SetPath();
+    }
     public override void Execute()
     {
         Debug.Log("PATROLING");
@@ -60,11 +65,16 @@ public class EnemyPatrolState<T> : State<T>, IPoints
             else
             {
                 _isFinishPath = true;
+                SetPath();
                 return;
             }
         }
         _model.Move(dir.normalized);
         _model.LookDir(dir);
+    }
+    public void SetPath()
+    {
+
     }
     public bool IsFinishPath => _isFinishPath;
 }

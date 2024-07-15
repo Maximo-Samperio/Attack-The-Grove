@@ -7,6 +7,7 @@ public class Pursuit : ISteering
     Transform _entity;
     Rigidbody _target;
     float _timePrediction;
+    public Rigidbody _rb;
 
     public Pursuit(Transform entity, Rigidbody target, float timePrediction)
     {
@@ -14,6 +15,7 @@ public class Pursuit : ISteering
         _target = target;
         _timePrediction = timePrediction;
     }
+    public Pursuit() { }
     public Vector3 GetDir()
     {
         Vector3 point = _target.position + _target.transform.forward * _target.velocity.magnitude * _timePrediction;
@@ -35,4 +37,7 @@ public class Pursuit : ISteering
 #endif
         return dirToPoint;
     }
+
+    public Transform Target { set { _target = LeaderBehaviour.rb; } }
+
 }

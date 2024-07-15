@@ -15,6 +15,8 @@ public class EnemyController : MonoBehaviour
 
     Coroutine coroutine;
     [SerializeField] float _totalChaseTime;
+    [SerializeField] float _orderTime;
+    private bool order;
     public bool seen;
     public float currentHealth; //lefe
     ISteering _pursuit;
@@ -129,7 +131,7 @@ public class EnemyController : MonoBehaviour
         var chase = new ActionNode(() => _fsm.Transition(StatesEnum.Chase));
         var attack = new ActionNode(() => _fsm.Transition(StatesEnum.Attack));
         var death = new ActionNode(() => _fsm.Transition(StatesEnum.Death));
-        var flee = new ActionNode(() => _fsm.Transition(StatesEnum.Flee)); // lefe
+        var flee = new ActionNode(() => _fsm.Transition(StatesEnum.Flee));
         var Order = new ActionNode(() => _fsm.Transition(StatesEnum.Order));
 
         // Questions
@@ -137,9 +139,9 @@ public class EnemyController : MonoBehaviour
         var qAttackRange = new QuestionNode(QuestionAttackRange, attack, chase);
         var qOrder = new QuestionNode (QuestionOrder, qAttackRange, Order);
         var qLoS = new QuestionNode(QuestionLoS, qOrder, qPatrol);
-        var qFlee = new QuestionNode(() => currentHealth >= 5, qLoS, flee); //lefe
+        var qFlee = new QuestionNode(() => currentHealth >= 5, qLoS, flee);
         var qHealth = new QuestionNode(() => currentHealth >= 0, qFlee, death);
-        _root = qHealth; //lefe
+        _root = qHealth;
     }
 
     bool QuestionLoS()
@@ -179,12 +181,12 @@ public class EnemyController : MonoBehaviour
 
     bool QuestionOrder()
     {
-        if (seen == false)
+        if (order == false)
         {
-            Debug.Log("ORDER");
-            return true;
+            Debug.Log("ORDERING MINIONS");
+            StartCoroutine(OrderTime());
         }
-        return false;
+        return order;
     }
 
     bool QuestionPatrol()
@@ -249,6 +251,12 @@ public class EnemyController : MonoBehaviour
         seen = false;
     }
 
+    IEnumerator OrderTime()
+    {
+        order = true;
+        yield return new WaitForSeconds(_orderTime);
+        order = false;
+    }
 
     public IPoints GetStateWaypoints => _stateFollowPoints;
 }
