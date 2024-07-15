@@ -12,9 +12,9 @@ public class EnemyModel : MonoBehaviour
     public Node currentWayPoint;
     public int currentWaypointIndex = 0; // Index of the current waypoint
     public int index;
+    public GameObject Jagger;
     public float health;
-    public float Health => health;
-
+    public DroneModel[] drones;
 
     private void Awake()
     {
@@ -54,10 +54,11 @@ public class EnemyModel : MonoBehaviour
    
     IEnumerator Cooldown()
     {
-        // Add bullet logic
-        yield return true;
+        Jagger.SetActive(true); 
+        yield return new WaitForSeconds(0.5f);
+        Jagger.SetActive(false);
+
     }
-
-
+   
 
 }

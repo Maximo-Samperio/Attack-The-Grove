@@ -16,7 +16,7 @@ public class EnemyController : MonoBehaviour
     Coroutine coroutine;
     [SerializeField] float _totalChaseTime;
     public bool seen;
-    public float currentHealth;
+    public float currentHealth; //lefe
     ISteering _pursuit;
     ObstacleAvoidanceV2 _obstacleAvoidance;
 
@@ -30,12 +30,14 @@ public class EnemyController : MonoBehaviour
     public LayerMask maskObs;
     #endregion
 
+
+    public float attackRange;
     EnemyPatrolState<StatesEnum> _stateFollowPoints;
 
 
     private void Awake()
     {
-        currentHealth = _model.Health;
+        currentHealth = _model.health;
         _model = GetComponent<EnemyModel>();
         _los = GetComponent<ILineOfSight>();
         _targetRigidbody = target.GetComponent<Rigidbody>();
@@ -61,6 +63,7 @@ public class EnemyController : MonoBehaviour
         var attack = new EnemyAttackState<StatesEnum>(_model);
         var death = new EnemyDeathState<StatesEnum>(_model);
         var flee = new EnemyFleeState<StatesEnum>(_model, target.transform, _pursuit, _obstacleAvoidance); //lefe
+        var order = new EnemyOrderState<StatesEnum>(_model.drones);
 
         _stateFollowPoints = new EnemyPatrolState<StatesEnum>(_model);
 
@@ -69,29 +72,40 @@ public class EnemyController : MonoBehaviour
         idle.AddTransition(StatesEnum.Attack, attack);
         idle.AddTransition(StatesEnum.Death, death);
         idle.AddTransition(StatesEnum.Flee, flee);
+        idle.AddTransition(StatesEnum.Order, order);
 
-        chase.AddTransition(StatesEnum.Idle, idle);                     
-        chase.AddTransition(StatesEnum.Patrol, _stateFollowPoints);     
+        order.AddTransition(StatesEnum.Chase, chase);
+        order.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
+        order.AddTransition(StatesEnum.Attack, attack);
+        order.AddTransition(StatesEnum.Death, death);
+        order.AddTransition(StatesEnum.Flee, flee);
+
+        chase.AddTransition(StatesEnum.Idle, idle);
+        chase.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
         chase.AddTransition(StatesEnum.Attack, attack);
         chase.AddTransition(StatesEnum.Death, death);
         chase.AddTransition(StatesEnum.Flee, flee);
+        chase.AddTransition(StatesEnum.Order, order);
 
         attack.AddTransition(StatesEnum.Idle, idle);
         attack.AddTransition(StatesEnum.Chase, chase);
         attack.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
         attack.AddTransition(StatesEnum.Death, death);
         attack.AddTransition(StatesEnum.Flee, flee);
-
+        attack.AddTransition(StatesEnum.Order, order);
+        //
         flee.AddTransition(StatesEnum.Idle, idle);
         flee.AddTransition(StatesEnum.Chase, chase);
-        flee.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
+        flee.AddTransition(StatesEnum.Patrol, _stateFollowPoints);  //lefe
         flee.AddTransition(StatesEnum.Death, death);
         flee.AddTransition(StatesEnum.Attack, attack);
-
+        flee.AddTransition(StatesEnum.Order, order);
+        //
         _stateFollowPoints.AddTransition(StatesEnum.Idle, idle);
         _stateFollowPoints.AddTransition(StatesEnum.Chase, chase);
         _stateFollowPoints.AddTransition(StatesEnum.Death, death);
-        _stateFollowPoints.AddTransition(StatesEnum.Flee, flee);
+        _stateFollowPoints.AddTransition(StatesEnum.Flee, flee); //lefe
+        _stateFollowPoints.AddTransition(StatesEnum.Order, order);
 
         _fsm = new FSM<StatesEnum>(idle);
     }
@@ -116,15 +130,16 @@ public class EnemyController : MonoBehaviour
         var attack = new ActionNode(() => _fsm.Transition(StatesEnum.Attack));
         var death = new ActionNode(() => _fsm.Transition(StatesEnum.Death));
         var flee = new ActionNode(() => _fsm.Transition(StatesEnum.Flee)); // lefe
-
+        var Order = new ActionNode(() => _fsm.Transition(StatesEnum.Order));
 
         // Questions
         var qPatrol = new QuestionNode(QuestionPatrol, patrol, idle);
-        var qLoS = new QuestionNode(QuestionLoS, chase, qPatrol);
-        var qFlee = new QuestionNode(() => _model.Health >= 10, qLoS, flee);
-        var qHealth = new QuestionNode(() => _model.Health >= 0, qFlee, death);
-
-        _root = qHealth;
+        var qAttackRange = new QuestionNode(QuestionAttackRange, attack, chase);
+        var qOrder = new QuestionNode (QuestionOrder, qAttackRange, Order);
+        var qLoS = new QuestionNode(QuestionLoS, qOrder, qPatrol);
+        var qFlee = new QuestionNode(() => currentHealth >= 5, qLoS, flee); //lefe
+        var qHealth = new QuestionNode(() => currentHealth >= 0, qFlee, death);
+        _root = qHealth; //lefe
     }
 
     bool QuestionLoS()
@@ -151,11 +166,25 @@ public class EnemyController : MonoBehaviour
         seen = currLoS;
         return seen;
     }
-    bool QuestionHealth()
+    bool QuestionAttackRange()
     {
-        Debug.Log(_model.Health <= 0);
-        return _model.Health <= 0;
+       return _los.CheckRange(target.transform, attackRange);
+    }
 
+
+    public void QuestionHealth()
+    {
+        currentHealth = _model.health;
+    }
+
+    bool QuestionOrder()
+    {
+        if (seen == false)
+        {
+            Debug.Log("ORDER");
+            return true;
+        }
+        return false;
     }
 
     bool QuestionPatrol()
@@ -195,6 +224,10 @@ public class EnemyController : MonoBehaviour
         {
             _model.index = _model.currentWaypointIndex;
             IncreaseWaypontIndex();
+        }
+        if (other.gameObject.layer == 10 || other.gameObject.layer == 11)
+        {
+            currentHealth--;
         }
     }
 

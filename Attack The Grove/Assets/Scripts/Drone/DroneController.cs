@@ -17,11 +17,12 @@ public class DroneController : MonoBehaviour
     [SerializeField] float closeToLeader;
     [SerializeField] GameObject target;
 
+    public float attackRange;
+    public float currentHealth;
     public LeaderBehaviour leaderBehaviour;
-
+    ISteering _pursuit;
     ISteering _steering;
     ObstacleAvoidanceV2 _obstacleAvoidance;
-
     ILineOfSight _los;
 
     #region Steering
@@ -43,17 +44,47 @@ public class DroneController : MonoBehaviour
         InitializeSteerings();
         InitializedTree();
         InitializeFSM();
+
     }
 
     void InitializeFSM()
     {
         var idle = new DroneIdleState<StatesEnum>(_model);
         var follow = new DroneFollowState<StatesEnum>(_model, _steering, _obstacleAvoidance);
-       // var flee = new DroneStateFlee<StatesEnum>(_steering); //lefe
+        var flee = new DroneFleeState<StatesEnum>(_model, target.transform, _steering, _obstacleAvoidance);
+        var death = new DroneDeathState<StatesEnum>(_model);
+        var attack = new DroneAttackState<StatesEnum>(_model);
+        var chase = new DroneChaseState<StatesEnum>(_model, target.transform, _steering, _obstacleAvoidance);
 
         idle.AddTransition(StatesEnum.Follow, follow);
+        idle.AddTransition(StatesEnum.Death, death);
+        idle.AddTransition(StatesEnum.Flee, flee);
+        idle.AddTransition(StatesEnum.Attack, attack);
+        idle.AddTransition(StatesEnum.Chase, chase);
+
         follow.AddTransition(StatesEnum.Idle, idle);
-       // flee.AddTransition(StatesEnum.Follow, flee); //lefe
+        follow.AddTransition(StatesEnum.Flee, flee);
+        follow.AddTransition(StatesEnum.Death, death);
+        follow.AddTransition(StatesEnum.Attack, attack);
+        follow.AddTransition(StatesEnum.Chase, chase);
+
+        chase.AddTransition(StatesEnum.Idle, idle);
+        chase.AddTransition(StatesEnum.Attack, attack);
+        chase.AddTransition(StatesEnum.Death, death);
+        chase.AddTransition(StatesEnum.Flee, flee);
+
+
+        attack.AddTransition(StatesEnum.Idle, idle);
+        attack.AddTransition(StatesEnum.Death, death);
+        attack.AddTransition(StatesEnum.Flee, flee);
+        attack.AddTransition(StatesEnum.Follow, follow);
+        attack.AddTransition(StatesEnum.Chase, chase);
+
+        flee.AddTransition(StatesEnum.Flee, flee);
+        flee.AddTransition(StatesEnum.Idle, idle);
+        flee.AddTransition(StatesEnum.Death, death);
+        flee.AddTransition(StatesEnum.Attack, attack);
+        flee.AddTransition(StatesEnum.Chase, chase);
 
         _fsm = new FSM<StatesEnum>(idle);
     }
@@ -73,13 +104,18 @@ public class DroneController : MonoBehaviour
         // Actions
         var idle = new ActionNode(() => _fsm.Transition(StatesEnum.Idle));
         var follow = new ActionNode(() => _fsm.Transition(StatesEnum.Follow));
+        var death = new ActionNode(() => _fsm.Transition(StatesEnum.Death)); //lefe
+        var attack = new ActionNode(() => _fsm.Transition(StatesEnum.Attack));
         var flee = new ActionNode(() => _fsm.Transition(StatesEnum.Flee)); //lefe
-        var attack = new ActionNode(() => EndGame());
-        
+        var chase = new ActionNode(() => _fsm.Transition(StatesEnum.Chase));
+
         // Questions
         QuestionNode distanceToLead = new QuestionNode(QuestionTooClose, idle, follow);
 
-        var qLoS = new QuestionNode(QuestionLoS, attack, follow);
+        var qAttackRange = new QuestionNode(QuestionAttackRange, attack, chase);
+        var qLoS = new QuestionNode(() => _model.fight == true, qAttackRange, follow);
+        var qFlee = new QuestionNode(() => currentHealth >= 10, qLoS, flee);
+        var qHealth = new QuestionNode(() => currentHealth >= 0, qFlee, death);
 
         _root = distanceToLead;
     }
@@ -109,14 +145,29 @@ public class DroneController : MonoBehaviour
         return true;
     }
 
+    bool QuestionAttackRange()
+    {
+        return _los.CheckRange(target.transform, attackRange);
+    }
 
     void Update()
     {
         _fsm.OnUpdate();
         _root.Execute();
+        currentHealth = _model.health;
     }
 
-    private void EndGame()
+
+    private void OnTriggerEnter(Collider other)
+    {
+
+        if (other.gameObject.layer == 10 || other.gameObject.layer == 11)
+        {
+            currentHealth--;
+        }
+
+    }
+        private void EndGame()
     {
         Debug.Log("PLAYER SPOTTED BY DRONE!");
         SceneManager.LoadScene("GameOver");

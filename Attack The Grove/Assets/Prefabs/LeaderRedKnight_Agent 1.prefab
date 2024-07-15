@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 4079118292684216}
   - component: {fileID: 95382778294392932}
   - component: {fileID: 6882742752616928650}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LeaderRedKnight_Agent 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -538,7 +538,7 @@ GameObject:
   - component: {fileID: 4377730764668552480}
   - component: {fileID: 6080155887437247916}
   - component: {fileID: 5321050902188819405}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LeaderBlueKnight_Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -559,6 +559,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8089075200967359819}
+  - {fileID: 7375687557545688658}
   m_Father: {fileID: 4079118292684216}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!137 &137707879336973850
@@ -703,6 +704,7 @@ MonoBehaviour:
   _agentController: {fileID: 6882742752616928650}
   _totalChaseTime: 100
   seen: 0
+  currentHealth: 0
   timePrediction: 0
   angle: 210
   radius: 0.5
@@ -710,6 +712,7 @@ MonoBehaviour:
   maskObs:
     serializedVersion: 2
     m_Bits: 8
+  attackRange: 0
 --- !u!114 &6080155887437247916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -727,6 +730,8 @@ MonoBehaviour:
   currentWayPoint: {fileID: 0}
   currentWaypointIndex: 0
   index: 0
+  Jagger: {fileID: 671189572416894397}
+  health: 0
 --- !u!114 &5321050902188819405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1425,3 +1430,56 @@ Transform:
   - {fileID: 4931071484798056}
   m_Father: {fileID: 4475122965245958}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &671189572416894397
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7375687557545688658}
+  - component: {fileID: 348029256775204}
+  m_Layer: 10
+  m_Name: AttackCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7375687557545688658
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671189572416894397}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -1.0060002, z: 1.064}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4475122965245958}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &348029256775204
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671189572416894397}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.88181275, y: 0.49654278, z: 0.81280565}
+  m_Center: {x: -0.030591568, y: 0.045270525, z: -0.09359717}
