@@ -19,10 +19,10 @@ public class LeaderBehaviour : MonoBehaviour, IFlockingBehaviour
     }
     public Vector3 GetDir(List<IBoid> boids, IBoid self)
     {
-        if (isActive)
-            return (target.position - self.Position).normalized * multiplier;
-        return Vector3.zero;
-        //return _steering.GetDir() * multiplier;
+        //if (isActive)
+        //    return (target.position - self.Position).normalized * multiplier;
+        //return Vector3.zero;
+        return _steering.GetDir() * multiplier;
 
     }
     public void SetTarget(Transform target)
@@ -31,7 +31,7 @@ public class LeaderBehaviour : MonoBehaviour, IFlockingBehaviour
         var rb = target.GetComponent<Rigidbody>();
         if (rb != null)
         {
-
+            _pursuit.Target = rb;
             _steering = _pursuit;
         }
         else

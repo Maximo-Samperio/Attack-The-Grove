@@ -38,6 +38,6 @@ public class Pursuit : ISteering
         return dirToPoint;
     }
 
-    //public Transform Target { set { _target = LeaderBehaviour.rb; } }
+    public Rigidbody Target { set { _target = value; } }
 
 }

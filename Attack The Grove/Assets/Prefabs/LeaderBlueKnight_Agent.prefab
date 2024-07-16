@@ -534,6 +534,7 @@ GameObject:
   - component: {fileID: 4475122965245958}
   - component: {fileID: 137707879336973850}
   - component: {fileID: 2671610401702130842}
+  - component: {fileID: 2091460667167294572}
   - component: {fileID: 4377730764668552480}
   - component: {fileID: 6080155887437247916}
   - component: {fileID: 6675165907448089114}
@@ -663,6 +664,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!136 &2091460667167294572
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415562082638514}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.0563695
+  m_Height: 0.50559914
+  m_Direction: 1
+  m_Center: {x: -0.00076857227, y: 0.018126769, z: 0.9678904}
 --- !u!114 &4377730764668552480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,21 +699,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e826457d3f32f2a4197c8fd28cda554c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _model: {fileID: 0}
+  _model: {fileID: 6080155887437247916}
   target: {fileID: 0}
-  _agentController: {fileID: 0}
-  _totalChaseTime: 0
-  _orderTime: 0
+  _agentController: {fileID: 2987282683798822140}
+  _totalChaseTime: 100
+  _orderTime: 1
   seen: 0
   currentHealth: 0
-  timePrediction: 1
+  timePrediction: 0
   angle: 210
   radius: 0.5
   personalArea: 1
   maskObs:
     serializedVersion: 2
     m_Bits: 8
-  attackRange: 0
+  attackRange: 5
 --- !u!114 &6080155887437247916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,7 +747,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   range: 10
-  angle: 110
+  angle: 360
   maskObs:
     serializedVersion: 2
     m_Bits: 8

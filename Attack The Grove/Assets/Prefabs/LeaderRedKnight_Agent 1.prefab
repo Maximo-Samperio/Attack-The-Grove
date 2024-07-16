@@ -713,7 +713,7 @@ MonoBehaviour:
   maskObs:
     serializedVersion: 2
     m_Bits: 8
-  attackRange: 0
+  attackRange: 5
 --- !u!114 &6080155887437247916
 MonoBehaviour:
   m_ObjectHideFlags: 0
