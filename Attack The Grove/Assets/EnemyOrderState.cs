@@ -15,7 +15,7 @@ public class EnemyOrderState<T> : State<T>
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("AAAAAAAA");
+        Debug.Log("Entered Order");
         for (var i = 0; i < _drones.Length; i++)
         {
             _drones[i].AttackOrder();
@@ -24,7 +24,7 @@ public class EnemyOrderState<T> : State<T>
 
     public override void Execute()
     {
-        Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        Debug.Log("Entered ORDER");
         base.Execute();
     }
 }

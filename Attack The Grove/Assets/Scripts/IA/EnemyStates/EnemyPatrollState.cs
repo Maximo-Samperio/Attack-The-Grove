@@ -44,7 +44,6 @@ public class EnemyPatrolState<T> : State<T>, IPoints
     {
         _nextPoint = 0;
         if (newPoints.Count == 0) return;
-        //_anim.Play("CIA_Idle");
         _waypoints = newPoints;
         var pos = _waypoints[_nextPoint];
         pos.y = _model.transform.position.y;

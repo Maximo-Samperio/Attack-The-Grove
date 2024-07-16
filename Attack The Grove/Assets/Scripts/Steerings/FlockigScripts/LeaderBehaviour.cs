@@ -15,13 +15,14 @@ public class LeaderBehaviour : MonoBehaviour, IFlockingBehaviour
     {
         _seek = new Seek();
         _pursuit = new Pursuit();
+         
     }
     public Vector3 GetDir(List<IBoid> boids, IBoid self)
     {
-        //if (isActive)
-        //    return (target.position - self.Position).normalized * multiplier;
-        //return Vector3.zero;
-        return _steering.GetDir() * multiplier;
+        if (isActive)
+            return (target.position - self.Position).normalized * multiplier;
+        return Vector3.zero;
+        //return _steering.GetDir() * multiplier;
 
     }
     public void SetTarget(Transform target)
