@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] EnemyModel _model;
     [SerializeField] GameObject target;
     [SerializeField] AgentController _agentController;
+    [SerializeField] private HealthBar _healthBar;
     private Rigidbody _targetRigidbody;
 
     Coroutine coroutine;
@@ -50,7 +51,9 @@ public class EnemyController : MonoBehaviour
         InitializeSteerings();
         InitializedTree();
         InitializeFSM();
-        Debug.Log(currentHealth);
+        currentHealth = _model.health;
+
+
         if (_agentController != null)
         {
             IncreaseWaypontIndex();
@@ -216,8 +219,6 @@ public class EnemyController : MonoBehaviour
     {
         _fsm.OnUpdate();
         _root.Execute();
-        Debug.Log(currentHealth);
-
     }
 
     private void OnTriggerEnter(Collider other)
@@ -230,6 +231,8 @@ public class EnemyController : MonoBehaviour
         if (other.gameObject.layer == 10 || other.gameObject.layer == 11)
         {
             currentHealth--;
+            _healthBar.UpdateHealthBar(_model.health, currentHealth);
+
         }
     }
 
