@@ -93,4 +93,42 @@ public class AgentController : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(_enemy.transform.position, radius);
     }
+
+    public Node FindFurthestNode(Vector3 startPos)
+    {
+        Node startNode = GetNearNode(startPos);
+        if (startNode == null) return null;
+
+        Queue<Node> queue = new Queue<Node>();
+        Dictionary<Node, int> distances = new Dictionary<Node, int>();
+        Node furthestNode = startNode;
+        int maxDistance = 0;
+
+        queue.Enqueue(startNode);
+        distances[startNode] = 0;
+
+        while (queue.Count > 0)
+        {
+            Node current = queue.Dequeue();
+            int currentDistance = distances[current];
+
+            foreach (Node neighbor in current.neighbours)
+            {
+                if (!distances.ContainsKey(neighbor))
+                {
+                    distances[neighbor] = currentDistance + 1;
+                    queue.Enqueue(neighbor);
+
+                    if (distances[neighbor] > maxDistance)
+                    {
+                        maxDistance = distances[neighbor];
+                        furthestNode = neighbor;
+                    }
+                }
+            }
+        }
+
+        return furthestNode;
+    }
+
 }
