@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -76,4 +77,85 @@ public class EnemyPatrolState<T> : State<T>, IPoints
 
     }
     public bool IsFinishPath => _isFinishPath;
+
+    private void SetNewPathWithRoulette()
+    {
+        List<float> probabilities = CalculateProbabilities();
+        int selectedIndex = RouletteWheelSelection(probabilities);
+
+        if (selectedIndex != -1)
+        {
+            Debug.Log("Selected new waypoint: " + selectedIndex);
+            Vector3 newDestination = _waypoints[selectedIndex];
+            _waypoints = AStarPathfinding(_model.transform.position, newDestination);
+            _nextPoint = 0;
+            _isFinishPath = false;
+        }
+        else
+        {
+            Debug.LogError("No waypoints available for selection");
+        }
+    }
+
+    private List<float> CalculateProbabilities()
+    {
+        List<float> distances = new List<float>();
+
+        // Calculate distances from the agent to each waypoint
+        foreach (Vector3 waypoint in _waypoints)
+        {
+            float distance = Vector3.Distance(_model.transform.position, waypoint);
+            distances.Add(distance);
+        }
+
+        List<float> probabilities = new List<float>();
+        float totalDistance = distances.Sum();
+
+        foreach (float distance in distances)
+        {
+            float probability = 1f - (distance / totalDistance);
+            probabilities.Add(probability);
+        }
+
+        return probabilities;
+    }
+
+    private int RouletteWheelSelection(List<float> probabilities)
+    {
+        float totalProbability = probabilities.Sum();
+        float randomValue = UnityEngine.Random.value * totalProbability; // Generate a random number between 0 and the sum of probabilities
+
+        // Make selection based on probabilities
+        float cumulativeProbability = 0f;
+        for (int i = 0; i < probabilities.Count; i++)
+        {
+            cumulativeProbability += probabilities[i];
+            if (randomValue <= cumulativeProbability)
+            {
+                return i;
+            }
+        }
+
+        // If no waypoint can be selected (should not happen if probabilities are correctly calculated)
+        Debug.LogError("No waypoints available for selection");
+        return -1;
+    }
+
+    private List<Vector3> AStarPathfinding(Vector3 start, Vector3 goal)
+    {
+        List<Vector3> path = AStar.Run(
+            start,
+            GetConnections,
+            node => node == goal,
+            (node1, node2) => Vector3.Distance(node1, node2),
+            node => Vector3.Distance(node, goal)
+        );
+
+        return path;
+    }
+
+    private List<Vector3> GetConnections(Vector3 node)
+    {
+        return _waypoints;
+    }
 }
