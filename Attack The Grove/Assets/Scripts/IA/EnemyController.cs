@@ -67,7 +67,7 @@ public class EnemyController : MonoBehaviour
         var chase = new EnemyChaseState<StatesEnum>(_model, _pursuit, _obstacleAvoidance);
         var attack = new EnemyAttackState<StatesEnum>(_model);
         var death = new EnemyDeathState<StatesEnum>(_model);
-        var flee = new EnemyFleeState<StatesEnum>(_model, target.transform, _pursuit, _obstacleAvoidance); //lefe
+        var flee = new EnemyFleeState<StatesEnum>(_model, new List<Node>(_model.waypoints), _obstacleAvoidance);
         var order = new EnemyOrderState<StatesEnum>(_model.drones);
 
         _stateFollowPoints = new EnemyPatrolState<StatesEnum>(_model);
@@ -98,18 +98,18 @@ public class EnemyController : MonoBehaviour
         attack.AddTransition(StatesEnum.Death, death);
         attack.AddTransition(StatesEnum.Flee, flee);
         attack.AddTransition(StatesEnum.Order, order);
-        //
+
         flee.AddTransition(StatesEnum.Idle, idle);
         flee.AddTransition(StatesEnum.Chase, chase);
-        flee.AddTransition(StatesEnum.Patrol, _stateFollowPoints);  //lefe
+        flee.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
         flee.AddTransition(StatesEnum.Death, death);
         flee.AddTransition(StatesEnum.Attack, attack);
         flee.AddTransition(StatesEnum.Order, order);
-        //
+
         _stateFollowPoints.AddTransition(StatesEnum.Idle, idle);
         _stateFollowPoints.AddTransition(StatesEnum.Chase, chase);
         _stateFollowPoints.AddTransition(StatesEnum.Death, death);
-        _stateFollowPoints.AddTransition(StatesEnum.Flee, flee); //lefe
+        _stateFollowPoints.AddTransition(StatesEnum.Flee, flee);
         _stateFollowPoints.AddTransition(StatesEnum.Order, order);
 
         _fsm = new FSM<StatesEnum>(idle);

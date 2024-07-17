@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EnemyModel : MonoBehaviour
 {
-
     [SerializeField] private float speed;
     Rigidbody _rb;
 
@@ -19,6 +18,13 @@ public class EnemyModel : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+
+        // Ensure waypoints are assigned
+        GameObject nodesParent = GameObject.Find("Nodes");
+        if (nodesParent != null)
+        {
+            waypoints = nodesParent.GetComponentsInChildren<Node>();
+        }
     }
 
     public void Move(Vector3 dir)
@@ -51,14 +57,10 @@ public class EnemyModel : MonoBehaviour
         Destroy(gameObject);
     }
 
-   
     IEnumerator Cooldown()
     {
-        Jagger.SetActive(true); 
+        Jagger.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         Jagger.SetActive(false);
-
     }
-   
-
 }
