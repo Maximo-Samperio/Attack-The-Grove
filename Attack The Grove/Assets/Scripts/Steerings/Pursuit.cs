@@ -15,9 +15,14 @@ public class Pursuit : ISteering
         _target = target;
         _timePrediction = timePrediction;
     }
+    public Pursuit(Transform entity)
+    {
+        _entity = entity;
+    }
     public Pursuit() { }
     public Vector3 GetDir()
     {
+        if (_entity == null || _target == null) return Vector3.zero;
         Vector3 point = _target.position + _target.transform.forward * _target.velocity.magnitude * _timePrediction;
         Vector3 dirToPoint = (point - _entity.position).normalized;
         Vector3 dirToTarget = (_target.position - _entity.position).normalized;

@@ -54,11 +54,11 @@ public class EnemyController : MonoBehaviour
         currentHealth = _model.health;
 
 
-        if (_agentController != null)
-        {
-            IncreaseWaypontIndex();
-            _agentController.RunAStar();
-        }
+        //if (_agentController != null)
+        //{
+        //    IncreaseWaypontIndex();
+        //    _agentController.RunAStar();
+        //}
     }
 
     void InitializeFSM()
@@ -70,7 +70,7 @@ public class EnemyController : MonoBehaviour
         var flee = new EnemyFleeState<StatesEnum>(_model, new List<Node>(_model.waypoints), _obstacleAvoidance);
         var order = new EnemyOrderState<StatesEnum>(_model.drones);
 
-        _stateFollowPoints = new EnemyPatrolState<StatesEnum>(_model);
+        _stateFollowPoints = new EnemyPatrolState<StatesEnum>(_model, _agentController);
 
         idle.AddTransition(StatesEnum.Chase, chase);
         idle.AddTransition(StatesEnum.Patrol, _stateFollowPoints);
@@ -143,6 +143,7 @@ public class EnemyController : MonoBehaviour
         var qOrder = new QuestionNode (QuestionOrder, qAttackRange, Order);
         var qLoS = new QuestionNode(QuestionLoS, qOrder, qPatrol);
         var qFlee = new QuestionNode(() => currentHealth >= 5, qLoS, flee);
+
         var qHealth = new QuestionNode(() => currentHealth >= 0, qFlee, death);
         _root = qHealth;
     }

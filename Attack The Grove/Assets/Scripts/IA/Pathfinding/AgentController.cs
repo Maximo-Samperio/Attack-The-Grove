@@ -78,10 +78,14 @@ public class AgentController : MonoBehaviour
     }
     List<Node> GetConnections(Node current)
     {
+  
         return current.neighbours;
     }
     bool IsSatiesfies(Node current)
     {
+        //overlap sphere 
+        // 5
+        //
         return current == target;
     }
     bool IsSatiesfies(Node current, Node end)
@@ -91,7 +95,7 @@ public class AgentController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(_enemy.transform.position, radius);
+        //Gizmos.DrawWireSphere(_enemy.transform.position, radius);
     }
 
     public Node FindFurthestNode(Vector3 startPos)

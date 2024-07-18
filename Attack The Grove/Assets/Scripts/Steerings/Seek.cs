@@ -6,7 +6,7 @@ public class Seek : ISteering
 {
     Transform _entity;
     Transform _target;
-    Vector3 _entityPosition;
+
     public Rigidbody rb;
 
     public Seek(Transform entity, Transform target)
@@ -14,9 +14,9 @@ public class Seek : ISteering
         _entity = entity;
         _target = target;
     }
-    public Seek(Transform target)
+    public Seek(Transform entity)
     {
-        _target = target;
+        _entity = entity;
     }
     public Seek() { }
 
@@ -24,14 +24,9 @@ public class Seek : ISteering
     {
         //a: entity;
         //b: _target;
-        return (_target.position - _entityPosition).normalized;
+        if(_target == null) return Vector3.zero;
+        return (_target.position - _entity.transform.position).normalized;
     }
-    public Vector3 Entity
-    {
-        set
-        {
-            _entityPosition = value;
-        }
-    }
+ 
     public Transform Target { set { _target = value; } }
 }

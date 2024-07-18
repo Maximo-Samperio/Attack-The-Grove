@@ -13,9 +13,11 @@ public class EnemyPatrolState<T> : State<T>, IPoints
     List<Vector3> _waypoints;
     int _nextPoint = 0;
     bool _isFinishPath = true;
-    public EnemyPatrolState(EnemyModel model)
+    AgentController _controller;
+    public EnemyPatrolState(EnemyModel model, AgentController agentController)
     {
         _model = model;
+        _controller = agentController;
     }
     public override void Enter()
     {
@@ -60,6 +62,7 @@ public class EnemyPatrolState<T> : State<T>, IPoints
         Vector3 dir = posPoint - _model.transform.position;
         if (dir.magnitude < 0.2f)
         {
+            Debug.Log("aaa");
             if (_nextPoint + 1 < _waypoints.Count)
                 _nextPoint++;
             else
@@ -74,7 +77,7 @@ public class EnemyPatrolState<T> : State<T>, IPoints
     }
     public void SetPath()
     {
-
+        SetNewPathWithRoulette();
     }
     public bool IsFinishPath => _isFinishPath;
 
@@ -87,9 +90,8 @@ public class EnemyPatrolState<T> : State<T>, IPoints
         {
             Debug.Log("Selected new waypoint: " + selectedIndex);
             Vector3 newDestination = _waypoints[selectedIndex];
-            _waypoints = AStarPathfinding(_model.transform.position, newDestination);
-            _nextPoint = 0;
-            _isFinishPath = false;
+            var path = AStarPathfinding(_model.transform.position, newDestination);
+            SetWayPoints(path);
         }
         else
         {
@@ -141,21 +143,13 @@ public class EnemyPatrolState<T> : State<T>, IPoints
         return -1;
     }
 
-    private List<Vector3> AStarPathfinding(Vector3 start, Vector3 goal)
+    private List<Node> AStarPathfinding(Vector3 start, Vector3 goal)
     {
-        List<Vector3> path = AStar.Run(
-            start,
-            GetConnections,
-            node => node == goal,
-            (node1, node2) => Vector3.Distance(node1, node2),
-            node => Vector3.Distance(node, goal)
-        );
-
-        return path;
+        return _controller.RunAStar2(start, goal);
     }
 
-    private List<Vector3> GetConnections(Vector3 node)
-    {
-        return _waypoints;
-    }
+    //private List<Vector3> GetConnections(Vector3 node)
+    //{
+    //    return _waypoints;
+    //}
 }
